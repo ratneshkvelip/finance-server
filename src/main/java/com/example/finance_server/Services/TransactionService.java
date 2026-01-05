@@ -1,11 +1,13 @@
 package com.example.finance_server.Services;
 
 import com.example.finance_server.ErrorHandler.BusinessException;
-import com.example.finance_server.Model.TransactionDTO;
-import com.example.finance_server.Model.User;
+import com.example.finance_server.Model.TransactionReqBody;
 import com.example.finance_server.Repository.TransactionRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,27 +15,37 @@ import java.util.List;
 @Service
 public class TransactionService {
 
+    private static final Logger log = LoggerFactory.getLogger(TransactionService.class);
     private final TransactionRepository transactionRepository;
 
     public TransactionService(TransactionRepository transactionRepository) {
         this.transactionRepository = transactionRepository;
     }
 
-    public List<TransactionDTO> getOrders(int userId) {
-        return transactionRepository.findOrdersByUserId(userId);
-    }
-
-    public String addUser(User user) {
-
+    public String addTransaction(TransactionReqBody transaction, String userName) {
+        int userId=0,accountId=0;
         try {
-            transactionRepository.addUser(user);
-        } catch (DuplicateKeyException e) {
-            throw new BusinessException("Email already exists", "USER_DUPLICATE");
-
-        } catch (DataIntegrityViolationException e) {
-            throw new BusinessException("Invalid user data", "USER_INVALID_DATA");
+            userId= transactionRepository.getUserId(userName);
+            accountId = transactionRepository.getAccount(transaction.getAccount());
+        }catch (EmptyResultDataAccessException e){
+            log.error("e: ", e);
         }
 
-        return "Successfully Added user.";
+        try {
+            int id=transactionRepository.addTransaction(transaction,userId,accountId);
+        } catch (DuplicateKeyException e) {
+            throw new BusinessException("User already exists", "USER_DUPLICATE");
+        } catch (DataIntegrityViolationException e) {
+            log.error("e: ", e);
+            throw new BusinessException("Invalid user data", "INVALID_DATA");
+        }catch(Exception e){
+            log.error("e: ", e);
+        }
+
+        return "Successfully Added transaction.";
+    }
+
+    public List<TransactionReqBody> getAllTransactions(String userName) {
+        return transactionRepository.getAllTransaction(userName);
     }
 }

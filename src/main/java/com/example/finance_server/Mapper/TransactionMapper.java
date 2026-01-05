@@ -1,20 +1,25 @@
 package com.example.finance_server.Mapper;
 
-import com.example.finance_server.Model.TransactionDTO;
+import com.example.finance_server.Model.TransactionReqBody;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class TransactionMapper  implements RowMapper<TransactionDTO> {
+public class TransactionMapper  implements RowMapper<TransactionReqBody> {
 
     @Override
-    public TransactionDTO mapRow(ResultSet rs, int rowNum)
+    public TransactionReqBody mapRow(ResultSet rs, int rowNum)
             throws SQLException {
 
-        TransactionDTO dto = new TransactionDTO();
-        dto.setName(rs.getString("name"));
-        dto.setA1(rs.getString("email"));
+        TransactionReqBody dto = new TransactionReqBody();
+        dto.setAccount(rs.getString("bank_name"));
+        dto.setCategory(rs.getString("category"));
+        dto.setDescription(rs.getString("description"));
+        dto.setSubCategory(rs.getString("sub_category"));
+        dto.setMethod(rs.getString("method"));
+        dto.setTransactionType(rs.getString("transaction_type"));
+        dto.setAmount(rs.getInt("amount"));
 
         return dto;
     }
