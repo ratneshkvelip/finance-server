@@ -33,8 +33,6 @@ public class TransactionService {
 
         try {
             int id=transactionRepository.addTransaction(transaction,userId,accountId);
-        } catch (DuplicateKeyException e) {
-            throw new BusinessException("User already exists", "USER_DUPLICATE");
         } catch (DataIntegrityViolationException e) {
             log.error("e: ", e);
             throw new BusinessException("Invalid user data", "INVALID_DATA");
