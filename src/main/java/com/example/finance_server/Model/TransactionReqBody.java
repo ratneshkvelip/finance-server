@@ -1,5 +1,6 @@
 package com.example.finance_server.Model;
 
+
 public class TransactionReqBody {
     private String category;
     private String subCategory;
